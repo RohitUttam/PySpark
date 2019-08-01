@@ -35,6 +35,9 @@ clusters = KMeans.train(data, K, maxIterations=10,
 # Print out the cluster assignments
 resultRDD = data.map(lambda point: clusters.predict(point)).cache()
 
+#Note: cache() -> use it whenever you apply to functions on an RDD,
+#                 in order to avoid computing the RDD twice.
+
 print("Counts by value:")
 counts = resultRDD.countByValue()
 print(counts)
@@ -50,9 +53,7 @@ def error(point):
     return sqrt(sum([x**2 for x in (point - center)]))
 
 WSSSE = data.map(lambda point: error(point)).reduce(lambda x, y: x + y)
-print("Within Set Sum of Squared Error = " + str(WSSSE))
+# reduce is just a way to do the sum, an allow for this operation to be distributed
+# this way, part of the sums can be operated in one machine and the rest in another machine.
 
-# Things to try:
-# What happens to WSSSE as you increase or decrease K? Why?
-# What happens if you don't normalize the input data before clustering?
-# What happens if you change the maxIterations or runs parameters?
+print("Within Set Sum of Squared Error = " + str(WSSSE))
